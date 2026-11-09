@@ -1,6 +1,244 @@
 @BibliotecaAPI_HostAddress = http://localhost:5111
 
-GET {{BibliotecaAPI_HostAddress}}/weatherforecast/
+# Pruebas de BibliotecaAPI contra la BBDD Biblioteca (SQL Server).
+# Antes de probar, ejecuta BBDD/datos.sql en SSMS para tener los datos iniciales.
+# Los POST correctos (201) guardan de verdad en la BBDD: si los repites dan error
+# de duplicado. Para volver a empezar, ejecuta otra vez el script.
+# El error 1 (error interno) no se puede provocar desde aquí: salta si falla la BBDD.
+
+######## CATEGORÍAS ########
+
+### GET de todas las categorías (las 4 del script)
+GET {{BibliotecaAPI_HostAddress}}/categories
 Accept: application/json
 
-###
+### POST de categoría correcta (201, Id 5)
+POST {{BibliotecaAPI_HostAddress}}/categories
+Content-Type: application/json
+
+{
+  "name": "Poesía",
+  "description": "Libros de poemas"
+}
+
+### POST de categoría vacía (error 3)
+POST {{BibliotecaAPI_HostAddress}}/categories
+Content-Type: application/json
+
+{
+}
+
+### POST de categoría sin nombre (error 4)
+POST {{BibliotecaAPI_HostAddress}}/categories
+Content-Type: application/json
+
+{
+  "name": "",
+  "description": "Una categoría sin nombre"
+}
+
+### POST de categoría con nombre repetido, aunque cambien mayúsculas (error 5)
+POST {{BibliotecaAPI_HostAddress}}/categories
+Content-Type: application/json
+
+{
+  "name": "novela",
+  "description": "Repetida"
+}
+
+######## AUTORES ########
+
+### GET de todos los autores (los 5 del script)
+GET {{BibliotecaAPI_HostAddress}}/authors
+Accept: application/json
+
+### GET de un autor por Id
+GET {{BibliotecaAPI_HostAddress}}/authors?id=2
+Accept: application/json
+
+### GET de un autor que no existe (404, error 2)
+GET {{BibliotecaAPI_HostAddress}}/authors?id=99
+Accept: application/json
+
+### GET de autores por nacionalidad, sin distinguir mayúsculas (Shelley, Pratchett y Gaiman)
+GET {{BibliotecaAPI_HostAddress}}/authors?nationality=BRITÁNICA
+Accept: application/json
+
+### POST de autor correcto (201, Id 6)
+POST {{BibliotecaAPI_HostAddress}}/authors
+Content-Type: application/json
+
+{
+  "name": "Gloria Fuertes",
+  "nationality": "española",
+  "birth_year": 1917
+}
+
+### POST de autor vacío (error 3)
+POST {{BibliotecaAPI_HostAddress}}/authors
+Content-Type: application/json
+
+{
+}
+
+### POST de autor sin nombre (error 4)
+POST {{BibliotecaAPI_HostAddress}}/authors
+Content-Type: application/json
+
+{
+  "name": "",
+  "nationality": "española",
+  "birth_year": 1900
+}
+
+### POST de autor con año de nacimiento futuro (error 25)
+POST {{BibliotecaAPI_HostAddress}}/authors
+Content-Type: application/json
+
+{
+  "name": "Autor del futuro",
+  "nationality": "española",
+  "birth_year": 2999
+}
+
+### POST de autor con nombre repetido, aunque cambien mayúsculas (error 33)
+POST {{BibliotecaAPI_HostAddress}}/authors
+Content-Type: application/json
+
+{
+  "name": "isaac asimov",
+  "nationality": "estadounidense",
+  "birth_year": 1920
+}
+
+######## LIBROS ########
+
+### POST de libro correcto (201, Id 6): guarda el libro y su fila en AuthorBook
+POST {{BibliotecaAPI_HostAddress}}/books
+Content-Type: application/json
+
+{
+  "title": "Fundación e Imperio",
+  "isbn": "9780000000010",
+  "pages": 320,
+  "publication_year": 1952,
+  "category_id": 2,
+  "authors_id": [2]
+}
+
+### POST de libro sin título (error 20)
+POST {{BibliotecaAPI_HostAddress}}/books
+Content-Type: application/json
+
+{
+  "title": "",
+  "isbn": "9780000000011",
+  "pages": 300,
+  "publication_year": 2000,
+  "category_id": 1,
+  "authors_id": [1]
+}
+
+### POST de libro con ISBN incorrecto (error 21)
+POST {{BibliotecaAPI_HostAddress}}/books
+Content-Type: application/json
+
+{
+  "title": "ISBN malo",
+  "isbn": "12AB",
+  "pages": 300,
+  "publication_year": 2000,
+  "category_id": 1,
+  "authors_id": [1]
+}
+
+### POST de libro con más de 2000 páginas (error 22)
+POST {{BibliotecaAPI_HostAddress}}/books
+Content-Type: application/json
+
+{
+  "title": "Demasiado largo",
+  "isbn": "9780000000012",
+  "pages": 5000,
+  "publication_year": 2000,
+  "category_id": 1,
+  "authors_id": [1]
+}
+
+### POST de libro con año de publicación futuro (error 23)
+POST {{BibliotecaAPI_HostAddress}}/books
+Content-Type: application/json
+
+{
+  "title": "Libro del futuro",
+  "isbn": "9780000000013",
+  "pages": 300,
+  "publication_year": 2999,
+  "category_id": 1,
+  "authors_id": [1]
+}
+
+### POST de libro sin autores (error 24)
+POST {{BibliotecaAPI_HostAddress}}/books
+Content-Type: application/json
+
+{
+  "title": "Sin autores",
+  "isbn": "9780000000014",
+  "pages": 300,
+  "publication_year": 2000,
+  "category_id": 1,
+  "authors_id": []
+}
+
+### POST de libro con una categoría que no existe (error 34)
+POST {{BibliotecaAPI_HostAddress}}/books
+Content-Type: application/json
+
+{
+  "title": "Categoría inventada",
+  "isbn": "9780000000015",
+  "pages": 300,
+  "publication_year": 2000,
+  "category_id": 99,
+  "authors_id": [1]
+}
+
+### POST de libro con un autor que no existe (error 35)
+POST {{BibliotecaAPI_HostAddress}}/books
+Content-Type: application/json
+
+{
+  "title": "Autor inventado",
+  "isbn": "9780000000016",
+  "pages": 300,
+  "publication_year": 2000,
+  "category_id": 1,
+  "authors_id": [2, 99]
+}
+
+### POST de libro con ISBN repetido (error 36): es el de Don Quijote
+POST {{BibliotecaAPI_HostAddress}}/books
+Content-Type: application/json
+
+{
+  "title": "Otro Quijote",
+  "isbn": "9780000000001",
+  "pages": 300,
+  "publication_year": 2000,
+  "category_id": 1,
+  "authors_id": [1]
+}
+
+### POST de libro con varios fallos a la vez: salen TODOS (errores 34 y 35 dos veces)
+POST {{BibliotecaAPI_HostAddress}}/books
+Content-Type: application/json
+
+{
+  "title": "Todo mal",
+  "isbn": "9780000000017",
+  "pages": 300,
+  "publication_year": 2000,
+  "category_id": 99,
+  "authors_id": [98, 99]
+}
