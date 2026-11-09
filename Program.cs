@@ -1,3 +1,6 @@
+using BibliotecaAPI.Data;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -5,6 +8,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+
+// Registro de Entity Framework Core (DbContext)
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection"); // DefaultConnection: Es el nombre de la cadena de conexión definida en el archivo appsettings.json
+// Registrar el DbContext
+builder.Services.AddDbContext<BibliotecaDbContext>(options => options.UseSqlServer(connectionString));
+
 
 var app = builder.Build();
 
