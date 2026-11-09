@@ -9,7 +9,7 @@
 
         public string Nationality { get; set; } = string.Empty;
 
-        public DateTime BirthYear { get; set; }
+        public int  BirthYear { get; set; }
 
 
         //Relacion m-n autores y libros
