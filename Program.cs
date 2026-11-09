@@ -1,5 +1,6 @@
 using BibliotecaAPI.Data;
 using BibliotecaAPI.DTO;
+using BibliotecaAPI.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -38,6 +39,11 @@ builder.Services.AddOpenApi();
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection"); // DefaultConnection: Es el nombre de la cadena de conexión definida en el archivo appsettings.json
 // Registrar el DbContext
 builder.Services.AddDbContext<BibliotecaDbContext>(options => options.UseSqlServer(connectionString));
+
+// Repositorios: Scoped = uno nuevo por cada petición HTTP, igual que el DbContext
+builder.Services.AddScoped<CategoryRepository>();
+builder.Services.AddScoped<AuthorRepository>();
+builder.Services.AddScoped<BookRepository>();
 
 
 var app = builder.Build();

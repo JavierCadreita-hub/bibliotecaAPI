@@ -19,6 +19,7 @@ namespace BibliotecaAPI.DTO
         public string Title { get; set; } = string.Empty;
 
         [JsonPropertyName("isbn")]
+        [Required(ErrorMessage = "21|El ISBN debe tener exactamente 13 dígitos")]
         [RegularExpression(@"^[0-9]{13}$", ErrorMessage = "21|El ISBN debe tener exactamente 13 dígitos")]
         public string Isbn { get; set; } = string.Empty;
 
